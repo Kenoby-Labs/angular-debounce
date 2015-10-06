@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/shahata/angular-debounce.git"
+    "url": "git://github.com/Kenoby-Labs/angular-debounce.git"
   },
   "author": "Shahar Talmi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shahata/angular-debounce/issues"
+    "url": "https://github.com/Kenoby-Labs/angular-debounce/issues"
   },
-  "homepage": "https://github.com/shahata/angular-debounce",
+  "homepage": "https://github.com/Kenoby-Labs/angular-debounce",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-release": "~0.6.0",
