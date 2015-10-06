@@ -1,28 +1,28 @@
 'use strict';
 
-describe('unit testing angular debounce service', function () {
-  var debounce, $timeout;
+describe('unit testing angular $debounce service', function () {
+  var $debounce, $timeout;
 
-  beforeEach(module('debounce'));
+  beforeEach(module('ngDebounce'));
 
   beforeEach(function () {
-    inject(function (_debounce_, _$timeout_) {
-      debounce = _debounce_;
+    inject(function (_$debounce_, _$timeout_) {
+      $debounce = _$debounce_;
       $timeout = _$timeout_;
     });
   });
 
   it('should invoke callback after specified delay', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    debounce(spy, 100)();
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    $debounce(spy, 100)();
     expect(spy).not.toHaveBeenCalled();
     $timeout.flush(100);
     expect(spy).toHaveBeenCalled();
   });
 
   it('should wait again if another call arrives during wait', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var debounced = debounce(spy, 100);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var debounced = $debounce(spy, 100);
     debounced();
     $timeout.flush(99);
     debounced();
@@ -33,8 +33,8 @@ describe('unit testing angular debounce service', function () {
   });
 
   it('should pass the arguments from the last call to the callback', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var debounced = debounce(spy, 100);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var debounced = $debounce(spy, 100);
     debounced(1);
     debounced(2);
     debounced(3);
@@ -44,26 +44,26 @@ describe('unit testing angular debounce service', function () {
   });
 
   it('should be able to create multiple unrelated debouncers', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var spy2 = jasmine.createSpy('debounceFunc2');
-    debounce(spy, 100)(1);
-    debounce(spy2, 100)(2);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var spy2 = jasmine.createSpy('ngDebounceFunc2');
+    $debounce(spy, 100)(1);
+    $debounce(spy2, 100)(2);
     $timeout.flush(100);
     expect(spy).toHaveBeenCalledWith(1);
     expect(spy2).toHaveBeenCalledWith(2);
   });
 
-  it('should return the value from the last debounce', function () {
-    var spy =  jasmine.createSpy('debounceFunc').andCallFake(angular.identity);
-    var debounced = debounce(spy, 100);
+  it('should return the value from the last ngDebounce', function () {
+    var spy =  jasmine.createSpy('ngDebounceFunc').andCallFake(angular.identity);
+    var debounced = $debounce(spy, 100);
     expect(debounced(1)).toEqual(undefined);
     $timeout.flush(100);
     expect(debounced(2)).toEqual(1);
   });
 
   it('should support immediate mode where the leading edge function is triggered instead of the trailing', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var debounced = debounce(spy, 100, true);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var debounced = $debounce(spy, 100, true);
     debounced(1);
     debounced(2);
     debounced(3);
@@ -75,8 +75,8 @@ describe('unit testing angular debounce service', function () {
   });
 
   it('should support canceling of debounce, returning triggers to default state', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var debounced = debounce(spy, 100);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var debounced = $debounce(spy, 100);
     debounced();
     debounced.cancel();
     $timeout.flush(100);
@@ -84,8 +84,8 @@ describe('unit testing angular debounce service', function () {
   });
 
   it('should support canceling correctly also for immediate mode', function () {
-    var spy = jasmine.createSpy('debounceFunc');
-    var debounced = debounce(spy, 100, true);
+    var spy = jasmine.createSpy('ngDebounceFunc');
+    var debounced = $debounce(spy, 100, true);
     debounced(1);
     expect(spy).toHaveBeenCalledWith(1);
     debounced.cancel();
@@ -96,7 +96,7 @@ describe('unit testing angular debounce service', function () {
 
 describe('Calling $timeout with invokeApply', function () {
   var mocks = {};
-  var $timeout, debounce;
+  var $timeout, $debounce;
 
   angular.module('TimeoutMockModule', []).factory('$timeout', function(){
     $timeout = jasmine.createSpy();
@@ -105,36 +105,36 @@ describe('Calling $timeout with invokeApply', function () {
     return $timeout;
   });
 
-  beforeEach(module('debounce', 'TimeoutMockModule'));
-  beforeEach(inject(function (_debounce_, _$timeout_) {
-    debounce = _debounce_;
+  beforeEach(module('ngDebounce', 'TimeoutMockModule'));
+  beforeEach(inject(function (_$debounce_, _$timeout_) {
+    $debounce = _$debounce_;
     $timeout = _$timeout_;
   }));
 
   it('should support calling $timeout with correct invokeApply parameter', function () {
     var func = function () {};
-    var debounced = debounce(func, 100, false, true);
+    var debounced = $debounce(func, 100, false, true);
     debounced();
     expect(mocks.$timeout).toHaveBeenCalledWith(jasmine.any(Function), 100, true);
-    debounced = debounce(func, 100, false, false);
+    debounced = $debounce(func, 100, false, false);
     debounced();
     expect(mocks.$timeout).toHaveBeenCalledWith(jasmine.any(Function), 100, false);
-    debounced = debounce(func, 100);
+    debounced = $debounce(func, 100);
     debounced();
     expect(mocks.$timeout).toHaveBeenCalledWith(jasmine.any(Function), 100, undefined);
   });
 });
 
-describe('unit testing angular debounce directive', function () {
-  var $compile, $rootScope, element, defer, debounce;
+describe('unit testing angular ngDebounce directive', function () {
+  var $compile, $rootScope, element, defer, $debounce;
 
-  beforeEach(module('debounce'));
+  beforeEach(module('ngDebounce'));
 
   beforeEach(function () {
     defer = null;
     module(function ($provide) {
-      $provide.service('debounce', function ($q) {
-        debounce = jasmine.createSpy('debounce').andCallFake(function (func) {
+      $provide.service('$debounce', function ($q) {
+        $debounce = jasmine.createSpy('$debounce').andCallFake(function (func) {
           /* jshint validthis:true */
           function debounced() {
             var args = arguments;
@@ -150,7 +150,7 @@ describe('unit testing angular debounce directive', function () {
           };
           return debounced;
         });
-        return debounce;
+        return $debounce;
       });
     });
 
@@ -160,8 +160,8 @@ describe('unit testing angular debounce directive', function () {
     });
   });
 
-  it('should wait with updating of model until debounce is triggered', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100"></input>')($rootScope);
+  it('should wait with updating of model until ngDebounce is triggered', function () {
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100"></input>')($rootScope);
     element.val('shahar');
     element.trigger('change');
     expect($rootScope.blah).toBeFalsy();
@@ -171,7 +171,7 @@ describe('unit testing angular debounce directive', function () {
   });
 
   it('should cancel pending view changes when model is changed', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100"></input>')($rootScope);
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100"></input>')($rootScope);
     element.val('shahar');
     element.trigger('change');
     $rootScope.blah = 'talmi';
@@ -182,7 +182,7 @@ describe('unit testing angular debounce directive', function () {
   });
 
   it('should return previous value while debouncing', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100"></input>')($rootScope);
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100"></input>')($rootScope);
     element.val('shahar');
     element.trigger('change');
     defer.resolve();
@@ -193,7 +193,7 @@ describe('unit testing angular debounce directive', function () {
   });
 
   it('should return previous model while debouncing', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100"></input>')($rootScope);
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100"></input>')($rootScope);
     $rootScope.blah = 'shahar';
     $rootScope.$digest();
     element.val('talmi');
@@ -202,7 +202,7 @@ describe('unit testing angular debounce directive', function () {
   });
 
   it('should live well with other parsers', function () {
-    element = $compile('<input type="checkbox" ng-model="blah" debounce="100" ng-true-value="\'YES\'" ng-false-value="\'NO\'"></input>')($rootScope);
+    element = $compile('<input type="checkbox" ng-model="blah" ng-debounce="100" ng-true-value="\'YES\'" ng-false-value="\'NO\'"></input>')($rootScope);
     $rootScope.blah = 'YES';
     $rootScope.$digest();
     element.click();
@@ -211,14 +211,14 @@ describe('unit testing angular debounce directive', function () {
     expect($rootScope.blah).toEqual('NO');
   });
 
-  it('should invoke debounce with delay param', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100"></input>')($rootScope);
-    expect(debounce).toHaveBeenCalledWith(jasmine.any(Function), 100, false);
+  it('should invoke ngDebounce with delay param', function () {
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100"></input>')($rootScope);
+    expect($debounce).toHaveBeenCalledWith(jasmine.any(Function), 100, false);
   });
 
-  it('should invoke debounce with immediate param', function () {
-    element = $compile('<input type="text" ng-model="blah" debounce="100" immediate="true"></input>')($rootScope);
-    expect(debounce).toHaveBeenCalledWith(jasmine.any(Function), 100, true);
+  it('should invoke ngDebounce with immediate param', function () {
+    element = $compile('<input type="text" ng-model="blah" ng-debounce="100" immediate="true"></input>')($rootScope);
+    expect($debounce).toHaveBeenCalledWith(jasmine.any(Function), 100, true);
   });
 
 });

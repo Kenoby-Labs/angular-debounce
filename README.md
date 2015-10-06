@@ -25,18 +25,18 @@ Include script tag in your html document.
 Add a dependency to your application module.
 
 ```javascript
-angular.module('myApp', ['debounce']);
+angular.module('myApp', ['ngDebounce']);
 ```
 
 ## Service Usage
 
-`debounce(func, wait, [immediate], [invokeApply])`
+`$debounce(func, wait, [immediate], [invokeApply])`
 
 ### Arguments
 
 |Param|Type|Details|
 |---|---|---|
-|func|function|The function we want to **debounce**|
+|func|function|The function we want to **ngDebounce**|
 |wait|number|Number of miliseconds to **wait** before invoking the debounced function|
 |immediate (optional)|boolean|Pass `true` for the **immediate** parameter to cause **debounce** to trigger the function on the leading instead of the trailing edge of the **wait** interval. Useful in circumstances like preventing accidental double-clicks on a "submit" button from firing a second time.|
 |invokeApply (optional)|boolean|`invokeApply` param passed to `$timeout` service (defines whether apply should be called in order to trigger a digest cycle at the end of the `func` call) - see [$timeout](https://docs.angularjs.org/api/ng/service/$timeout) service for more details|
@@ -50,8 +50,8 @@ The returned function also has a `cancel()` method which can be used in case you
 ## Directive Usage
 
 ```html
-<input type="text" ng-model="blah" debounce="500"></input>
-<input type="checkbox" ng-model="blah" debounce="500" immediate="true"></input>
+<input type="text" ng-model="blah" ng-debounce="500"></input>
+<input type="checkbox" ng-model="blah" ng-debounce="500" immediate="true"></input>
 etc.
 ```
 

@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('debounce', [])
-  .service('debounce', ['$timeout', function ($timeout) {
+angular.module('ngDebounce', [])
+  .service('$debounce', ['$timeout', function ($timeout) {
     return function (func, wait, immediate, invokeApply) {
       var timeout, args, context, result;
       function debounce() {
@@ -31,35 +31,35 @@ angular.module('debounce', [])
       return debounce;
     };
   }])
-  .directive('debounce', ['debounce', '$parse', function (debounce, $parse) {
+  .directive('ngDebounce', ['$debounce', '$parse', function ($debounce, $parse) {
     return {
       require: 'ngModel',
       priority: 999,
       link: function ($scope, $element, $attrs, ngModelController) {
-        var debounceDuration = $parse($attrs.debounce)($scope);
+        var ngDebounceDuration = $parse($attrs.ngDebounce)($scope);
         var immediate = !!$parse($attrs.immediate)($scope);
-        var debouncedValue, pass;
+        var ngDebouncedValue, pass;
         var prevRender = ngModelController.$render.bind(ngModelController);
-        var commitSoon = debounce(function (viewValue) {
+        var commitSoon = $debounce(function (viewValue) {
           pass = true;
-          ngModelController.$$lastCommittedViewValue = debouncedValue;
+          ngModelController.$$lastCommittedViewValue = ngDebouncedValue;
           ngModelController.$setViewValue(viewValue);
           pass = false;
-        }, parseInt(debounceDuration, 10), immediate);
+        }, parseInt(ngDebounceDuration, 10), immediate);
         ngModelController.$render = function () {
           prevRender();
           commitSoon.cancel();
           //we must be first parser for this to work properly,
           //so we have priority 999 so that we unshift into parsers last
-          debouncedValue = this.$viewValue;
+          ngDebouncedValue = this.$viewValue;
         };
         ngModelController.$parsers.unshift(function (value) {
           if (pass) {
-            debouncedValue = value;
+            ngDebouncedValue = value;
             return value;
           } else {
             commitSoon(ngModelController.$viewValue);
-            return debouncedValue;
+            return ngDebouncedValue;
           }
         });
       }
